@@ -1,0 +1,85 @@
+package recfun
+
+object Main {
+  def main(args: Array[String]) {
+    /*    println("Pascal's Triangle")
+        for (row <- 0 to 10) {
+          for (col <- 0 to row)
+            print(pascal(col, row) + " ")
+          println()
+        }*/
+
+    //println(balance(":-)".toList))
+    //println(balance("I told him (that it’s not (yet) done). (But he wasn’t listening)))".toList))
+    println(countChange(10,List(1,2,4)))
+  }
+
+  /**
+    * Exercise 1
+    */
+  def pascal(c: Int, r: Int): Int =
+    if (c == 0 || c == r) 1
+    else pascal(c - 1, r - 1) + pascal(c, r - 1)
+
+  /**
+    * Exercise 2
+    */
+  def balance(chars: List[Char]): Boolean = {
+
+    val xchars = chars.filter(x => x == '(' || x == ')')
+    if (xchars.count(_ == '(') != xchars.count(_ == ')')) false
+
+    def balanceIter(chars: List[Char], counter: Int): Boolean = {
+      if (counter == 0 && chars.isEmpty) true
+      else if (counter < 0 || counter > 0 && chars.isEmpty) false
+      else if (isStart(chars.head)) balanceIter(chars.tail, counter + 1)
+      else balanceIter(chars.tail, counter - 1)
+    }
+
+    def isStart(char: Char): Boolean =
+      if (char == '(') true else false
+
+    def isEnd(char: Char): Boolean =
+      if (char == ')') true else false
+
+    balanceIter(xchars, 0)
+  }
+
+  /**
+    * Exercise 3
+    */
+  def countChange(money: Int, coins: List[Int]): Int = {
+    def countIter(subMoney: Int, coinIndex: Int, coinIndexCounter: Int): Int = {
+      var nextSubmoney = if (subMoney < money && subMoney - coins(coinIndexCounter) > coins(coinIndex))
+                            subMoney - coins(coinIndexCounter)
+                         else subMoney - coins(coinIndexCounter + 1)
+      if (subMoney == 0) 0 else if (subMoney % coins(coinIndex) == 0) 1 +
+        (if (coins.length - 1 >= coinIndexCounter + 1 && subMoney > coins(coinIndexCounter + 1))
+          countIter(nextSubmoney, coinIndex, coinIndexCounter + 1)
+        else 0)
+      else if (coins.length - 1 >= coinIndexCounter + 1 && subMoney > coins(coinIndexCounter + 1))
+        countIter(nextSubmoney, coinIndex, coinIndexCounter + 1)
+      else 0
+    }
+
+    def iter(sMon: Int, curCoin: Int, counterCoin: Int): Int={
+      var mon = if(sMon != money && sMon - coins(counterCoin) <= 0 && sMon % coins(curCoin) != 0) decreaseMon(counterCoin + 1) else sMon
+      var next = if(mon == money || sMon - coins(counterCoin) <= 0 && mon - coins(counterCoin) % coins(curCoin) != 0) counterCoin + 1 else counterCoin
+
+      if(coins.length - 1 < next) 0 else
+      if(mon % coins(curCoin) == 0) 1 + iter(mon - coins(next), curCoin, next)
+      else 0
+    }
+
+    def decreaseMon(coinIndex: Int)= {
+      var res = money
+      for (x <- coins.indices if x <= coinIndex)
+        res -= coins(x)
+      res
+    }
+    var counter: Int = 0
+    for (x <- coins.indices)
+      counter += iter(money, x, 0)
+    counter
+  }
+}
