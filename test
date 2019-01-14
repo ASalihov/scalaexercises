@@ -63,8 +63,8 @@ object Main {
     }
 
     def iter(sMon: Int, curCoin: Int, counterCoin: Int): Int={
-      var mon = if(sMon != money && sMon - coins(counterCoin) <= 0 && sMon % coins(curCoin) != 0) decreaseMon(counterCoin + 1) else sMon
-      var next = if(mon == money || sMon - coins(counterCoin) <= 0 && mon - coins(counterCoin) % coins(curCoin) != 0) counterCoin + 1 else counterCoin
+      var mon = if(sMon != money && sMon - coins(counterCoin) <= 0 && (sMon == 0 || sMon % coins(curCoin) != 0)) decreaseMon(counterCoin) else sMon
+      var next = if(mon == money || sMon - coins(counterCoin) <= 0 && mon % coins(curCoin) != 0) counterCoin + 1 else counterCoin
 
       if(coins.length - 1 < next) 0 else
       if(mon % coins(curCoin) == 0) 1 + iter(mon - coins(next), curCoin, next)
@@ -73,8 +73,9 @@ object Main {
 
     def decreaseMon(coinIndex: Int)= {
       var res = money
-      for (x <- coins.indices if x <= coinIndex)
-        res -= coins(x)
+      //for (x <- coins.indices if x <= coinIndex)
+        res -= coins(coinIndex)
+        res -= coins(coinIndex + 1)
       res
     }
     var counter: Int = 0
